@@ -125,6 +125,8 @@ void add_relevant_include_for_decl(NamedDecl const *decl, IncludeSet &includes /
 
 			{"<exception>", {"std::nested_exception"}},
 
+			{"<stdexcept>", {"std::runtime_error"}},
+
 			{"<functional>", {"std::function", "std::_Manager_operation", "std::bad_function_call"}},
 
 			{"<iterator>",
@@ -291,6 +293,8 @@ void add_relevant_include_for_decl(NamedDecl const *decl, IncludeSet &includes /
 		make_pair("<bits/stl_heap.h>", "<algorithm>"),
 
 		make_pair("<bits/types/__mbstate_t.h>", "<ios>"),
+
+		make_pair("<bits/stdexcept_except.h>", "<stdexcept>"),
 
 		// C headers
 		make_pair("<bits/libio.h>", "<stdio.h>"),
