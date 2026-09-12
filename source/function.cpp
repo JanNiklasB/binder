@@ -384,7 +384,7 @@ string bind_function(FunctionDecl const *F, uint args_to_bind, bool request_bind
 		documentation = generate_documentation_string_for_declaration(F);
 		if( documentation.size() ) documentation += "\\n\\n";
 		documentation +=
-			"C++: " + standard_name(F->getQualifiedNameAsString() + "(" + function_arguments(F) + ')' + (m and m->isConst() ? " const" : "") + " --> " + standard_name(F->getReturnType()));
+			"Signiture\\n---------\\nC++: " + standard_name(F->getQualifiedNameAsString() + "(" + function_arguments(F) + ')' + (m and m->isConst() ? " const" : "") + " --> " + standard_name(F->getReturnType()));
 	}
 	else {
 		pair<string, string> args = function_arguments_for_lambda(F, args_to_bind);
