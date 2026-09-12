@@ -298,17 +298,18 @@ string generate_comment_for_declaration(clang::NamedDecl const *decl)
 }
 
 
-string remove_regex(string text, string regex)
-{
-	std::regex whitespaces(regex);
-	return std::regex_replace(text, whitespaces, "");
-}
-
 string get_param_text(comments::Comment const *C)
 {
 	auto param = dyn_cast<comments::ParamCommandComment>(C);
 	string argText = param->getParamNameAsWritten().str();
-	return string(argText + " : ");
+	return string(argText + "\n    ");
+}
+
+bool is_return_command(comments::Comment const *C)
+{
+	auto param = dyn_cast<comments::BlockCommandComment>(C);
+	unsigned int ID = param->getCommandID();
+	return (ID==comments::CommandTraits::getBuiltinCommandInfo("return")->getID()) || (ID==comments::CommandTraits::getBuiltinCommandInfo("returns")->getID());
 }
 
 // extract text from hierarchy of comments
@@ -316,7 +317,7 @@ string get_text(comments::Comment const *C, SourceManager const &SM, SourceLocat
 {
 	if( isa<comments::TextComment>(C) ) return string(dyn_cast<comments::TextComment>(C)->getText());
 	else {
-		string r, params;
+		string r, params, returns;
 
 		if( isa<comments::ParagraphComment>(C) ) r += '\n';
 
@@ -324,28 +325,47 @@ string get_text(comments::Comment const *C, SourceManager const &SM, SourceLocat
 #if( LLVM_VERSION_MAJOR < 8 )
 			if( SM.getSpellingLineNumber(previous) != SM.getSpellingLineNumber((*i)->getLocStart()) ) { // getBeginLoc
 				previous = (*i)->getLocStart(); // getBeginLoc();
-				r += '\n';
 			}
 #endif
 #if( LLVM_VERSION_MAJOR >= 8 )
 			if( SM.getSpellingLineNumber(previous) != SM.getSpellingLineNumber((*i)->getBeginLoc()) ) { // getBeginLoc
 				previous = (*i)->getBeginLoc(); // getBeginLoc();
-				r += '\n';
 			}
 #endif
 			if ( isa<comments::ParamCommandComment>(*i) ) {
 				params += get_param_text(*i);
-				params += remove_regex(get_text(*i, SM, previous), "^\\s+|\\s+$");
+				string tmp = trim(get_text(*i, SM, previous));
+				replace(tmp, "\n", "");
+				params += tmp;
 				params += '\n';
 				continue;
 			}
 			
-			r += remove_regex(get_text(*i, SM, previous), "^\\s+");
+			if ( isa<comments::BlockCommandComment>(*i) ) {
+				if (is_return_command(*i)){
+					string tmp = trim(get_text(*i, SM, previous));
+					replace(tmp, "\n", "");
+					returns += tmp;
+					continue;
+				}
+			}
+
+			r += '\n';
+			r += trim(get_text(*i, SM, previous));
+			r += '\n';
 		}
 
 		if (params.size()) {
-			r += string("PARAMETERS\n----------\n");
+			r += string("\nPARAMETERS\n----------\n");
 			r += params;
+			r += '\n';
+			
+		}
+
+		if (returns.size()) {
+			r += string("\nRETURNS\n-------\n");
+			r += returns;
+			r += '\n';
 		}
 
 		return r;
