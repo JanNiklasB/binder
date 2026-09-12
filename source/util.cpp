@@ -26,6 +26,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <fstream>
+#include <regex>
 
 using namespace llvm;
 using namespace clang;
@@ -297,14 +298,25 @@ string generate_comment_for_declaration(clang::NamedDecl const *decl)
 }
 
 
+string remove_regex(string text, string regex)
+{
+	std::regex whitespaces(regex);
+	return std::regex_replace(text, whitespaces, "");
+}
 
+string get_param_text(comments::Comment const *C)
+{
+	auto param = dyn_cast<comments::ParamCommandComment>(C);
+	string argText = param->getParamNameAsWritten().str();
+	return string(argText + " : ");
+}
 
 // extract text from hierarchy of comments
 string get_text(comments::Comment const *C, SourceManager const &SM, SourceLocation previous)
 {
-	if( auto tc = dyn_cast<comments::TextComment>(C) ) return string(tc->getText());
+	if( isa<comments::TextComment>(C) ) return string(dyn_cast<comments::TextComment>(C)->getText());
 	else {
-		string r;
+		string r, params;
 
 		if( isa<comments::ParagraphComment>(C) ) r += '\n';
 
@@ -321,7 +333,19 @@ string get_text(comments::Comment const *C, SourceManager const &SM, SourceLocat
 				r += '\n';
 			}
 #endif
-			r += get_text(*i, SM, previous);
+			if ( isa<comments::ParamCommandComment>(*i) ) {
+				params += get_param_text(*i);
+				params += remove_regex(get_text(*i, SM, previous), "^\\s+|\\s+$");
+				params += '\n';
+				continue;
+			}
+			
+			r += remove_regex(get_text(*i, SM, previous), "^\\s+");
+		}
+
+		if (params.size()) {
+			r += string("PARAMETERS\n----------\n");
+			r += params;
 		}
 
 		return r;
