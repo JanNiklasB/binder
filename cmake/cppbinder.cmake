@@ -17,7 +17,7 @@ The following command is defined for use with RosettaCommons/binder and pybind11
 		ROOTMODULE <modulename>
 		[OUTPUTFOLDER <directory>]
 		CONFIGFILE <file>
-		PROJECTLIB <file|target>
+		PROJECTLIB <file>
 		[PROJECTINCLUDES <file>...]
 		[PROJECTEXTRASOURCES <file>...]
 		HEADERS	<file>...			
@@ -37,7 +37,7 @@ The following command is defined for use with RosettaCommons/binder and pybind11
 		The configfile to use, same as binder --config ${CONFIGFILE}
 
 	``PROJECTLIB``
-		The library file|target to link to the generated binary, the target will be dependend on that file|target
+		The library file to link to the generated binary, the target will be dependend on that file
 
 	``PROJECTINCLUDES``
 		List of includes to add the generated pybind target, should be at least the ones used for ``PROJECTLIB``
@@ -125,7 +125,7 @@ function(cppbinder_add_target name)
 	)
 
 	add_custom_target(${name}_build ALL
-		COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR}/bindings-bld
+		COMMAND cmake --build ${ARG_BINARYFOLDER}
 		USES_TERMINAL
 		DEPENDS ${name}
 	)
