@@ -168,12 +168,14 @@ bool is_bindable(FieldDecl *f)
 // Generate bindings for class data member
 string bind_data_member(FieldDecl const *d, string const &class_qualified_name_)
 {
-	static vector<string> anonymous_types{"::(anonymous)", "::(anonymous union)"};
+	static vector<string> anonymous_types{"::(anonymous", "::(anonymous union"};
 
 	string class_qualified_name = class_qualified_name_;
 
 	for( const auto &anonymous : anonymous_types ) {
-		if( ends_with(class_qualified_name, anonymous) ) class_qualified_name.resize(class_qualified_name.size() - anonymous.size());
+		size_t idx = class_qualified_name.find(anonymous);
+		if(idx != string::npos)
+			class_qualified_name.resize(idx);
 	}
 
 	if( d->getType().isConstQualified() or !is_field_assignable(d) ) return ".def_readonly(\"{}\", &{}::{})"_format(d->getNameAsString(), class_qualified_name, d->getNameAsString());
