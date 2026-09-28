@@ -41,7 +41,7 @@ add_clang_executable(binder
   fmt/os.h
   )
 if (NOT VERSION)
-  set(VERSION 1.4.1)
+  set(VERSION 1.4.5)
 endif()  
 target_compile_definitions(binder PUBLIC BINDER_VERSION_STRING=\"${VERSION}\")
 if(USE_EXTERNAL_LLVM)
