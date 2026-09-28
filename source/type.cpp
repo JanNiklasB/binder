@@ -152,6 +152,8 @@ void add_relevant_include_for_decl(NamedDecl const *decl, IncludeSet &includes /
 
 			{"<string>", {"std::basic_string", "std::char_traits"}},
 
+			{"<string_view>", {"std::basic_string_view"}},
+
 			{"<thread>",
 			 {
 				 "std::thread::id",
@@ -236,6 +238,7 @@ void add_relevant_include_for_decl(NamedDecl const *decl, IncludeSet &includes /
 		make_pair("<bits/basic_string.tcc>", "<string>"),
 		make_pair("<__string>", "<string>"),
 		make_pair("<bits/streambuf_iterator.h>", "<streambuf>"),
+		make_pair("<bits/string_view.tcc>", "<string_view>"),
 
 		make_pair("<bits/shared_ptr.h>", "<memory>"),
 		make_pair("<bits/unique_ptr.h>", "<memory>"),
