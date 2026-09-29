@@ -46,7 +46,8 @@ if(NOT pybind11_FOUND OR pybind11_VERSION VERSION_LESS 3)
 		FetchContent_Declare(
 			pybind11
 			# RosettaCommons provide their own pybind11 fork which is guaranteed to work
-			GIT_REPOSITORY https://github.com/RosettaCommons/pybind11.git
+			GIT_REPOSITORY https://github.com/pybind/pybind11.git
+			GIT_TAG v3.1.0
 		)
 		
 		# set CMAKE_ARGS before add_subdirectory per set:
