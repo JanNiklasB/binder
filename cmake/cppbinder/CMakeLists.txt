@@ -40,7 +40,7 @@ find_package(Python 3.0 COMPONENTS Interpreter Development NumPy REQUIRED)
 
 # try finding pybind11, otherwise build it from source:
 find_package(pybind11)
-if(NOT pybind11_FOUND)
+if(NOT pybind11_FOUND OR pybind11_VERSION VERSION_LESS 3)
 	if(NOT pybind11_POPULATED)
 		include(FetchContent)
 		FetchContent_Declare(
