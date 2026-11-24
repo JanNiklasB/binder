@@ -461,13 +461,25 @@ void Context::generate(Config const &config)
 	}
 	replace(modules, "::", ".");
 
+	string pybind11_include = "#include <" + Config::get().pybind11_include_file() + ">\n";
+
 	string binding_function_decls, binding_function_calls;
 	for( auto &f : binding_function_names ) {
 		binding_function_decls += "void " + f + module_function_suffix + ";\n";
 		binding_function_calls += "\t" + f + "(M);\n";
 	}
-
-	string const pybind11_include = "#include <" + Config::get().pybind11_include_file() + ">";
+	for( auto &f : Config::get().add_on_binder_after_namespaces() ){
+		binding_function_calls += "\t" + f.second + "(M(\"" + f.first + "\"));\n";
+		
+		// add relevant includes
+		IncludeSet includes;
+		std::map<string, std::vector<string> > const &namespace_includes = Config::get().namespace_includes();
+		if( namespace_includes.count(f.first) ) {
+			std::vector<string> const &n_includes = namespace_includes.at(f.first);
+			for( auto const &i : n_includes ) includes.add_include(i);
+			pybind11_include += generate_include_directives(includes);
+		}
+	}
 
 	std::stringstream s;
 	s << fmt::format(main_module_header, pybind11_include, binding_function_decls, config.root_module, namespace_pairs, binding_function_calls);

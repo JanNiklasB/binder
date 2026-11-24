@@ -74,6 +74,7 @@ void Config::read(string const &file_name)
 
 	string const _binder_for_namespace_{"binder_for_namespace"};
 	string const _add_on_binder_for_namespace_{"add_on_binder_for_namespace"};
+	string const _add_on_binder_after_namespace_{"add_on_binder_after_namespace"};
 
 	string const _custom_shared_{"custom_shared"};
 
@@ -207,6 +208,13 @@ void Config::read(string const &file_name)
 			if( bind ) {
 				auto binder_function = split_in_two(name, "Invalid line for add_on_binder_for_namespace specification! Must be: name_of_type + <space or tab> + name_of_binder. Got: " + line);
 				add_on_binder_for_namespaces_[binder_function.first] = trim(binder_function.second);
+			}
+		}
+		else if( token == _add_on_binder_after_namespace_ ) {
+			
+			if( bind ) {
+				auto binder_function = split_in_two(name, "Invalid line for add_on_binder_after_namespace specification! Must be: name_of_type + <space or tab> + name_of_binder. Got: " + line);
+				add_on_binder_after_namespaces_[binder_function.first] = trim(binder_function.second);
 			}
 		}
 		else if( token == _field_ ) {
